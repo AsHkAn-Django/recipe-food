@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+{% load django_bootstrap5 %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Library</title>
+    {% bootstrap_css %}
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-2">
+        <a class="navbar-brand" href="#">Recipe Library</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavId" aria-controls="collapsibleNavId" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavId">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'myApp:home' %}" aria-current="page">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'myApp:add_ingredient' %}">Add Ingredient</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'myApp:add_recipe' %}">Add Recipe</a>
+                </li>
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="dropdownId" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{user.username}}</a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownId">
+                        <a class="dropdown-item" href="#">Profile</a>
+                        <form action="{% url 'logout' %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="dropdown-item">Logout</button>
+                        </form>
+                    </div>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'registration:sign_up' %}">Sign Up</a>
+                </li>                 
+                {% endif %}
+            </ul>
+            <form action="{% url 'myApp:filter_list' %}" class="d-flex my-2 my-lg-0" method="get">
+                <input class="form-control me-sm-2" type="text" name="query" placeholder="Search" />
+                <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Search</button>
+            </form>
+        </div>
+    </nav>
+    <div class="container my-4">
+        {% block content %}
+        {% endblock %}
+    </div>
+    {% bootstrap_javascript %}
+</body>
+</html>

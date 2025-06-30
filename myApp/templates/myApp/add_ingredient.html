@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+{% if messages %}
+<ul class="list-unstyled">
+    {% for message in messages %}
+        <li class="alert {% if message.tags %} alert-{{ message.tags }} {% endif %}">
+            {{ message }}
+        </li>
+    {% endfor %}
+</ul>
+
+{% endif %}
+    <div class="container text-center">
+        <h2>Add a new Ingredient</h2>
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <button type="submit" class="btn btn-outline-primary">Add</button>
+        </form>       
+    </div>
+{% endblock content %}

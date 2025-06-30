@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+    <div class="container text-center">
+        <h2>Add a new Recipe</h2>
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <p>Use Ctrl to choose more than one ingredient.</p>
+            <button type="submit" class="btn btn-outline-primary">Add</button>
+        </form>       
+    </div>
+{% endblock content %}
