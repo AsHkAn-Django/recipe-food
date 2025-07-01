@@ -140,3 +140,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = 'myApp:home'
 LOGOUT_REDIRECT_URL = 'myApp:home'
+
+
+
+# ------ EDAMAM NUTRITION API ------
+EDAMAM_APP_ID = config('EDAMAM_APP_ID')
+EDAMAM_APP_KEY = config('EDAMAM_APP_KEY')
