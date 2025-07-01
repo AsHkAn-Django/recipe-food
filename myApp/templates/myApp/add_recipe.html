@@ -2,13 +2,110 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-    <div class="container text-center">
-        <h2>Add a new Recipe</h2>
-        <form action="" method="post" enctype="multipart/form-data">
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      {% if messages %}
+      <div class="mb-4">
+        {% for msg in messages %}
+        <div class="alert alert-{{ msg.tags }}">{{ msg }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- Recipe Details -->
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white"><h4>Recipe Details</h4></div>
+        <div class="card-body">
+          <form id="recipe-form" method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            {% bootstrap_form form %}
-            <p>Use Ctrl to choose more than one ingredient.</p>
-            <button type="submit" class="btn btn-outline-primary">Add</button>
-        </form>       
+            {{ recipe_form.management_form }}
+            {% bootstrap_form recipe_form layout='vertical' %}
+        </div>
+      </div>
+
+      <!-- Ingredients Section -->
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+          <h5>Ingredients</h5>
+        </div>
+        <div class="card-body p-0">
+          {{ formset.management_form }}
+          <table class="table table-striped mb-0" id="ingredient-table">
+            <thead class="thead-light">
+              <tr><th>Ingredient</th><th>Qty</th><th>Unit</th><th>Remove</th></tr>
+            </thead>
+            <tbody>
+              {% for f in formset.forms %}
+              <tr>
+                <td>{{ f.ingredient }}</td>
+                <td>{{ f.quantity }}</td>
+                <td>{{ f.unit }}</td>
+                <td><button type="button" class="btn btn-outline-danger btn-sm remove-row">×</button></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <button type="button" id="add-row" class="btn btn-info m-1 btn-sm">+ Add Row</button>
+        </div>
+      </div>
+
+      <!-- Save Button -->
+      <div class="text-end mb-5">
+        <button type="submit" name="submit_recipe" class="btn btn-primary btn-lg">Save Recipe</button>
+      </div>
+      </form>
+
+      <!-- Inline New Ingredient -->
+      <div class="card shadow-sm">
+        <div class="card-header bg-warning text-dark"><h5>Forgot an Ingredient?</h5></div>
+        <div class="card-body">
+          <form id="new-ingredient-form" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ ingredient_form.management_form }}
+            {% bootstrap_form ingredient_form layout='vertical' %}
+            <div class="d-grid">
+              <button type="submit" class="btn btn-warning">Add Ingredient</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
+  </div>
+</div>
+
+<script>
+// AJAX add ingredient without losing recipe data
+const newForm = document.getElementById('new-ingredient-form');
+newForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const fd = new FormData(newForm);
+  const res = await fetch("{% url 'myApp:ajax_create_ingredient' %}", {
+    method: 'POST', headers: {'X-Requested-With':'XMLHttpRequest'}, body: fd
+  });
+  const data = await res.json();
+  if (data.success) {
+    document.querySelectorAll('select[name$="-ingredient"]').forEach(sel => {
+      sel.add(new Option(data.title,data.id));
+    });
+    newForm.reset();
+    alert('Added!');
+  } else alert('Error: '+JSON.stringify(data.errors));
+});
+
+// Dynamic formset rows
+const tbody = document.getElementById('ingredient-table').querySelector('tbody');
+const total = document.getElementById('id_ingredients-TOTAL_FORMS');
+document.getElementById('add-row').onclick = () => {
+  const idx = parseInt(total.value);
+  const row = tbody.querySelector('tr').cloneNode(true);
+  row.querySelectorAll('input,select').forEach(el=>{
+    const name=el.name.replace(/-\d+-/, `-${idx}-`);
+    el.name=name; el.id='id_'+name;
+    if(!['checkbox','radio'].includes(el.type)) el.value=''; else el.checked=false;
+  });
+  tbody.append(row); total.value=idx+1;
+};
+tbody.onclick = e=> e.target.matches('.remove-row') && e.target.closest('tr').remove();
+</script>
 {% endblock content %}

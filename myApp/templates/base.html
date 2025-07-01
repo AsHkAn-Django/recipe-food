@@ -19,9 +19,6 @@
                     <a class="nav-link active" href="{% url 'myApp:home' %}" aria-current="page">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'myApp:add_ingredient' %}">Add Ingredient</a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link" href="{% url 'myApp:add_recipe' %}">Add Recipe</a>
                 </li>
                 {% if user.is_authenticated %}
@@ -41,7 +38,7 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'registration:sign_up' %}">Sign Up</a>
-                </li>                 
+                </li>
                 {% endif %}
             </ul>
             <form action="{% url 'myApp:filter_list' %}" class="d-flex my-2 my-lg-0" method="get">
