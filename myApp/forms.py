@@ -6,6 +6,7 @@ from django.forms.models import BaseInlineFormSet
 
 
 class RecipeIngredientBaseFormSet(BaseInlineFormSet):
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for form in self.forms:
@@ -13,6 +14,7 @@ class RecipeIngredientBaseFormSet(BaseInlineFormSet):
 
 
 class IngredientForm(forms.ModelForm):
+
     class Meta:
         model = Ingredient
         fields = ['title', 'picture']
@@ -23,6 +25,7 @@ class IngredientForm(forms.ModelForm):
 
 
 class RecipeForm(forms.ModelForm):
+
     class Meta:
         model = Recipe
         fields = ['title', 'instruction', 'picture']
@@ -37,7 +40,6 @@ class RecipeIngredientForm(forms.ModelForm):
             'ingredient': forms.Select(attrs={'class': 'form-select'}),
             'quantity': forms.NumberInput(attrs={'class': 'form-control'}),
             'unit': forms.TextInput(attrs={'class': 'form-control'}),
-            'order': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
 
@@ -53,6 +55,7 @@ RecipeIngredientFormSet = inlineformset_factory(
 
 
 class RatingForm(forms.ModelForm):
+
     class Meta:
         model = Rating
         fields = ['rate']

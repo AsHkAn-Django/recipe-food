@@ -24,6 +24,9 @@ class RecipeDetailView(generic.DetailView):
 
 
 def add_recipe(request):
+    # We use or None instead of if reques is post else
+    # We always give a formset an empty queryset for adding a new parent and not editing
+    # We use prefix to avoid name collisions when multiple forms are in one page.
     recipe_form = RecipeForm(request.POST or None, request.FILES or None, prefix='recipe')
     formset = RecipeIngredientFormSet(request.POST or None, prefix='ingredients', queryset=RecipeIngredient.objects.none())
     ingredient_form = IngredientForm(request.POST or None, request.FILES or None, prefix='new_ing')
@@ -36,7 +39,7 @@ def add_recipe(request):
         return JsonResponse({'success': False, 'errors': ingredient_form.errors}, status=400)
 
     if request.method == 'POST':
-        # Recipe + ingredients submission
+        # 'submit_recipe' is the name of the button for submit so we realize user submited
         if 'submit_recipe' in request.POST:
             if recipe_form.is_valid() and formset.is_valid():
                 recipe = recipe_form.save()
@@ -49,11 +52,8 @@ def add_recipe(request):
                 return redirect('myApp:home')
         # fall through to render errors
 
-    return render(request, 'myApp/add_recipe.html', {
-        'recipe_form': recipe_form,
-        'formset': formset,
-        'ingredient_form': ingredient_form,
-    })
+    return render(request, 'myApp/add_recipe.html',
+                  {'recipe_form': recipe_form,'formset': formset,'ingredient_form': ingredient_form})
 
 
 class FilterListView(generic.ListView):

@@ -13,18 +13,17 @@
       </div>
       {% endif %}
 
-      <!-- Recipe Details -->
+      <!-- Recipe -->
       <div class="card mb-4 shadow-sm">
         <div class="card-header bg-primary text-white"><h4>Recipe Details</h4></div>
         <div class="card-body">
           <form id="recipe-form" method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ recipe_form.management_form }}
             {% bootstrap_form recipe_form layout='vertical' %}
         </div>
       </div>
 
-      <!-- Ingredients Section -->
+      <!-- Ingredients -->
       <div class="card mb-4 shadow-sm">
         <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
           <h5>Ingredients</h5>
@@ -62,7 +61,6 @@
         <div class="card-body">
           <form id="new-ingredient-form" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ ingredient_form.management_form }}
             {% bootstrap_form ingredient_form layout='vertical' %}
             <div class="d-grid">
               <button type="submit" class="btn btn-warning">Add Ingredient</button>
