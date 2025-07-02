@@ -6,6 +6,7 @@ TODOLIST.md
 *:.Zone.Identifier
 dump.rdb
 requests_test.py
+dump.json
 
 
 # Byte-compiled / optimized / DLL files

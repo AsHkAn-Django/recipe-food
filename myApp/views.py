@@ -5,9 +5,17 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http import JsonResponse
+from django.conf import settings
 
 from .models import Recipe, Rating, RecipeIngredient
 from .forms import IngredientForm, RecipeForm, RatingForm, RecipeIngredientFormSet
+from .utils import ingredients_hash
+
+import requests
+
+
+
+URL = "https://api.edamam.com/api/nutrition-details"
 
 
 
@@ -21,6 +29,14 @@ class RecipeDetailView(generic.DetailView):
     model = Recipe
     template_name = "myApp/recipe_detail.html"
     context_object_name = 'recipe'
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        recipe = context['recipe']
+        fetch_nutrition(recipe)
+        return context
+
 
 
 def add_recipe(request):
@@ -48,12 +64,46 @@ def add_recipe(request):
                     inst.recipe = recipe
                     inst.order = idx + 1  # auto-order
                     inst.save()
+
+                # fetch nutrition and add it to recipe
+                fetch_nutrition(recipe)
+
                 messages.success(request, 'Recipe saved successfully!')
                 return redirect('myApp:home')
-        # fall through to render errors
 
     return render(request, 'myApp/add_recipe.html',
                   {'recipe_form': recipe_form,'formset': formset,'ingredient_form': ingredient_form})
+
+
+def fetch_nutrition(recipe):
+    """ Get hash, if recipe doesn't have nutrition or has been edited,
+        fetch it again and add it to the recipe.
+    """
+    # Create the list of string ingredients and units
+    list_of_ingredients = [str(ing) for ing in recipe.recipe_ingredients.all()]
+    print(f'list of ingredients : {list_of_ingredients}')
+    # Create a hash for it
+    current_hash = ingredients_hash(list_of_ingredients)
+
+    if not recipe.nutrition_hash or recipe.nutrition_hash != current_hash:
+        params = {
+            "app_id": settings.EDAMAM_APP_ID,
+            "app_key": settings.EDAMAM_APP_KEY
+        }
+        payload = {"ingr": list_of_ingredients}
+
+        try:
+            response = requests.post(URL, params=params, json=payload, headers={"accept": "application/json"})
+            response.raise_for_status()
+            print(f'The Fetched Data: {response.json()}')
+
+            recipe.nutrition_data = response.json()
+            recipe.nutrition_hash = current_hash
+            recipe.save()
+            print('DATA HAS BEEN FETCHED AND SAVED')
+
+        except requests.RequestException as e:
+            print(f"Nutrition API error: {e}")
 
 
 class FilterListView(generic.ListView):

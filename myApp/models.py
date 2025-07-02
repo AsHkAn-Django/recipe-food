@@ -6,7 +6,7 @@ from decimal import Decimal
 
 class Ingredient(models.Model):
     title = models.CharField(max_length=264, unique=True)
-    picture = models.ImageField(upload_to='images/')
+    picture = models.ImageField(upload_to='images/', blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -15,9 +15,9 @@ class Ingredient(models.Model):
 class Recipe(models.Model):
     title = models.CharField(max_length=264)
     instruction = models.CharField(max_length=264)
-    picture = models.ImageField(upload_to='images/')
+    picture = models.ImageField(upload_to='images/', blank=True, null=True)
     ingredients = models.ManyToManyField(Ingredient, related_name='recipes', through='RecipeIngredient')
-    nutrittion_data = models.JSONField(null=True, blank=True)
+    nutrition_data = models.JSONField(null=True, blank=True)
     nutrition_hash = models.CharField(max_length=64, blank=True, null=True)
 
     def get_average_rating(self):
@@ -40,10 +40,10 @@ class Recipe(models.Model):
 
 
 class RecipeIngredient(models.Model):
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='recipe_ingredents')
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='recipe_ingredients')
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name='ingredients')
     quantity = models.DecimalField(max_digits=6, decimal_places=1)
-    unit = models.CharField(max_length=100)
+    unit = models.CharField(max_length=100, blank=True, null=True)
     order = models.PositiveIntegerField()
 
     class Meta:
@@ -53,7 +53,7 @@ class RecipeIngredient(models.Model):
         ordering = ['order']
 
     def __str__(self):
-        return f'{self.amount} of {self.ingredient.title}'
+        return f'{self.quantity} {self.unit} {self.ingredient.title}'
 
 
 class Rating(models.Model):
