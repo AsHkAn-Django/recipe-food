@@ -1,44 +1,127 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block content %}
-    <div class="container my-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="text-center mb-5">
-                    <h2 class="display-4 text-primary">{{ recipe.title }}</h2>
-                    <img src="{% if recipe.picture %}{{ recipe.picture.url }}{% else %}{% static 'images/no_photo.jpeg'%}{% endif %}"
-                    class="rounded img-fluid mb-4" alt="{{ recipe.title }}" style="max-height: 400px; object-fit: cover;">
-                </div>
-                <div class="bg-light p-4 rounded shadow-sm mb-5">
-                    <h3 class="text-success mb-3">Instructions:</h3>
-                    <p class="lead">{{ recipe.instruction }}</p>
-                </div>
-
-                <h4 class="text-center text-secondary mb-4">Ingredients</h4>
-                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-                    {% for ri in recipe.recipe_ingredients.all %}
-                    <div class="col">
-                        <div class="card border-light shadow-sm h-100">
-                            <img src="{% if ri.ingredient.picture %}{{ ri.ingredient.picture.url }}{% else %}{% static 'images/no_photo.jpeg'%}{% endif %}"
-                            class="card-img-top" alt="{{ ri.ingredient.title }}" style="max-height: 250px; object-fit: cover;">
-                            <div class="card-body">
-                                <h5 class="card-title text-primary">{{ ri.quantity }} {{ ri.unit }} {{ ri.ingredient.title }}</h5>
-                                <p class="card-text text-muted">Use this ingredient for preparing the recipe.</p>
-                            </div>
-
-                        </div>
-                    </div>
-                    {% endfor %}
-                    <div class="container">
-                        {{recipe.nutrittion_data}}
-                    </div>
-                </div>
-
-                <div class="text-center mt-5">
-                    <a href="{% url 'myApp:home' %}" class="btn btn-outline-primary btn-lg px-5 py-3">Back to Recipes</a>
-                </div>
-            </div>
+{% extends 'base.html' %} {% load static %} {% block content %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+        <h2 class="display-4 text-primary text-center">{{ recipe.title }}</h2>
+      <div class="row mb-5">
+        <div class="col-md-6 d-flex flex-column align-items-center">
+          <img
+            src="{% if recipe.picture %}{{ recipe.picture.url }}{% else %}{% static 'images/no_photo.jpeg'%}{% endif %}"
+            class="rounded img-fluid mt-3"
+            alt="{{ recipe.title }}"
+            style="
+              max-height: 400px;
+              object-fit: cover;
+              width: 100%;
+              max-width: 350px;
+            "
+          />
         </div>
+        <div class="col-md-6 d-flex flex-column justify-content-start">
+          {% if recipe.nutrition_data.foods %}
+          <div
+            class="bg-white border rounded shadow-sm p-3"
+            style="max-height: 400px; overflow-y: auto"
+          >
+            <h4 class="text-success mb-3 text-center">Nutrition Info</h4>
+            {% for food in recipe.nutrition_data.foods %}
+            <h5 class="text-muted text-center">
+              {{ food.food_name|title }} ({{ food.serving_qty }} {{
+              food.serving_unit }})
+            </h5>
+            <table
+              class="table table-sm table-bordered mb-3"
+              style="
+                font-size: 0.85rem;
+                max-width: 350px;
+                margin-left: auto;
+                margin-right: auto;
+              "
+            >
+              <tbody>
+                <tr>
+                  <th>Calories</th>
+                  <td>{{ food.nf_calories }}</td>
+                </tr>
+                <tr>
+                  <th>Total Fat</th>
+                  <td>{{ food.nf_total_fat }} g</td>
+                </tr>
+                <tr>
+                  <th>Saturated Fat</th>
+                  <td>{{ food.nf_saturated_fat }} g</td>
+                </tr>
+                <tr>
+                  <th>Cholesterol</th>
+                  <td>{{ food.nf_cholesterol }} mg</td>
+                </tr>
+                <tr>
+                  <th>Sodium</th>
+                  <td>{{ food.nf_sodium }} mg</td>
+                </tr>
+                <tr>
+                  <th>Carbohydrates</th>
+                  <td>{{ food.nf_total_carbohydrate }} g</td>
+                </tr>
+                <tr>
+                  <th>Sugars</th>
+                  <td>{{ food.nf_sugars }} g</td>
+                </tr>
+                <tr>
+                  <th>Protein</th>
+                  <td>{{ food.nf_protein }} g</td>
+                </tr>
+                <tr>
+                  <th>Potassium</th>
+                  <td>{{ food.nf_potassium }} mg</td>
+                </tr>
+              </tbody>
+            </table>
+            {% endfor %}
+          </div>
+          {% else %}
+          <p class="text-muted text-center">Nutrition data not available.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="bg-light p-4 rounded shadow-sm mb-5">
+        <h3 class="text-success mb-3">Instructions:</h3>
+        <p class="lead">{{ recipe.instruction }}</p>
+      </div>
+
+      <h4 class="text-center text-secondary mb-4">Ingredients</h4>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for ri in recipe.recipe_ingredients.all %}
+        <div class="col">
+          <div class="card border-light shadow-sm h-100">
+            <img
+              src="{% if ri.ingredient.picture %}{{ ri.ingredient.picture.url }}{% else %}{% static 'images/no_photo.jpeg'%}{% endif %}"
+              class="card-img-top"
+              alt="{{ ri.ingredient.title }}"
+              style="max-height: 250px; object-fit: cover"
+            />
+            <div class="card-body">
+              <h5 class="card-title text-primary">
+                {{ ri.quantity }} {{ ri.unit }} {{ ri.ingredient.title }}
+              </h5>
+              <p class="card-text text-muted">
+                Use this ingredient for preparing the recipe.
+              </p>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="text-center mt-5">
+        <a
+          href="{% url 'myApp:home' %}"
+          class="btn btn-outline-primary btn-lg px-5 py-3"
+          >Back to Recipes</a
+        >
+      </div>
     </div>
+  </div>
+</div>
 {% endblock content %}
