@@ -15,7 +15,7 @@ import requests
 
 
 
-URL = "https://api.edamam.com/api/nutrition-details"
+URL = "https://trackapi.nutritionix.com/v2/natural/nutrients"
 
 
 
@@ -79,21 +79,26 @@ def fetch_nutrition(recipe):
     """ Get hash, if recipe doesn't have nutrition or has been edited,
         fetch it again and add it to the recipe.
     """
-    # Create the list of string ingredients and units
-    list_of_ingredients = [str(ing) for ing in recipe.recipe_ingredients.all()]
-    print(f'list of ingredients : {list_of_ingredients}')
+    # Create the string ingredients and units
+    ingredients_text = ", ".join(str(ing) for ing in recipe.recipe_ingredients.all())
+
     # Create a hash for it
-    current_hash = ingredients_hash(list_of_ingredients)
+    current_hash = ingredients_hash(ingredients_text)
 
     if not recipe.nutrition_hash or recipe.nutrition_hash != current_hash:
-        params = {
-            "app_id": settings.EDAMAM_APP_ID,
-            "app_key": settings.EDAMAM_APP_KEY
+        headers = {
+            "x-app-id": settings.NUTRITIONIX_APP_ID,
+            "x-app-key": settings.NUTRITIONIX_APP_KEY,
+            "Content-Type": "application/json"
         }
-        payload = {"ingr": list_of_ingredients}
+
+        data = {
+            "query": ingredients_text,
+            "timezone": "US/Eastern"
+        }
 
         try:
-            response = requests.post(URL, params=params, json=payload, headers={"accept": "application/json"})
+            response = requests.post(URL, headers=headers, json=data)
             response.raise_for_status()
             print(f'The Fetched Data: {response.json()}')
 
@@ -104,6 +109,7 @@ def fetch_nutrition(recipe):
 
         except requests.RequestException as e:
             print(f"Nutrition API error: {e}")
+
 
 
 class FilterListView(generic.ListView):
