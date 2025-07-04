@@ -30,7 +30,6 @@ class RecipeDetailView(generic.DetailView):
     template_name = "myApp/recipe_detail.html"
     context_object_name = 'recipe'
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         recipe = context['recipe']
@@ -105,11 +104,34 @@ def fetch_nutrition(recipe):
             recipe.nutrition_data = response.json()
             recipe.nutrition_hash = current_hash
             recipe.save()
+            calculate_nutrition_fields(recipe)
+
             print('DATA HAS BEEN FETCHED AND SAVED')
 
         except requests.RequestException as e:
             print(f"Nutrition API error: {e}")
 
+    elif not recipe.calories:
+        calculate_nutrition_fields(recipe)
+
+
+def calculate_nutrition_fields(recipe):
+    calories = 0.0
+    protein = 0.0
+    fat = 0.0
+    carbs = 0.0
+    for food in recipe.nutrition_data.get("foods", []):
+        calories += food.get("nf_calories", 0)
+        protein += food.get("nf_protein", 0)
+        fat += food.get("nf_total_fat", 0)
+        carbs += food.get("nf_total_carbohydrate", 0)
+
+    recipe.calories = round(calories, 2)
+    recipe.protein = round(protein, 2)
+    recipe.fat = round(fat, 2)
+    recipe.carbs = round(carbs, 2)
+    print('✅ NUTRITION FIELDS FILLED ✅')
+    recipe.save()
 
 
 class FilterListView(generic.ListView):
