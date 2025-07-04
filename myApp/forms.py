@@ -5,6 +5,29 @@ from django.forms.models import BaseInlineFormSet
 
 
 
+class FilterRecipeForm(forms.Form):
+    calories = forms.DecimalField(
+        min_value=0, max_value=10000, decimal_places=2, max_digits=8,
+        required=False, label='Calories less than:',
+        widget=forms.TextInput(attrs={'placeholder': 'Ex. 50.4'})
+    )
+    protein = forms.DecimalField(
+        min_value=0, max_value=1000, decimal_places=2, max_digits=8,
+        required=False, label="Protein less than:",
+        widget=forms.TextInput(attrs={'placeholder': 'Ex. 50.4'})
+    )
+    fat = forms.DecimalField(
+        min_value=0, max_value=1000, decimal_places=2, max_digits=8,
+        required=False, label="Fat less than:",
+        widget=forms.TextInput(attrs={'placeholder': 'Ex. 50.4'})
+    )
+    carbs = forms.DecimalField(
+        min_value=0, max_value=1000, decimal_places=2, max_digits=8,
+        required=False, label='Carbs less than:',
+        widget=forms.TextInput(attrs={'placeholder': 'Ex. 50.4'})
+    )
+
+
 class RecipeIngredientBaseFormSet(BaseInlineFormSet):
 
     def __init__(self, *args, **kwargs):

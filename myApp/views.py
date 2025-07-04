@@ -8,7 +8,7 @@ from django.http import JsonResponse
 from django.conf import settings
 
 from .models import Recipe, Rating, RecipeIngredient
-from .forms import IngredientForm, RecipeForm, RatingForm, RecipeIngredientFormSet
+from .forms import IngredientForm, RecipeForm, RatingForm, RecipeIngredientFormSet, FilterRecipeForm
 from .utils import ingredients_hash
 
 import requests
@@ -18,11 +18,39 @@ import requests
 URL = "https://trackapi.nutritionix.com/v2/natural/nutrients"
 
 
-
 class IndexView(generic.ListView):
     model = Recipe
     context_object_name = 'recipes'
     template_name = "myApp/index.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        form = FilterRecipeForm(self.request.GET)
+        context['form'] = form
+
+        recipes = Recipe.objects.all()
+
+        if form.is_valid():
+            calories = form.cleaned_data.get('calories')
+            if calories is not None:
+                recipes = recipes.filter(calories__lte=calories)
+
+            protein = form.cleaned_data.get('protein')
+            if protein is not None:
+                recipes = recipes.filter(protein__lte=protein)
+
+            fat = form.cleaned_data.get('fat')
+            if fat is not None:
+                recipes = recipes.filter(fat__lte=fat)
+
+            carbs = form.cleaned_data.get('carbs')
+            if carbs is not None:
+                recipes = recipes.filter(carbs__lte=carbs)
+
+        context['recipes'] = recipes
+        return context
+
 
 
 class RecipeDetailView(generic.DetailView):
