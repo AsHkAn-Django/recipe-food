@@ -26,8 +26,7 @@
             <h4 class="text-success mb-3 text-center">Nutrition Info</h4>
             {% for food in recipe.nutrition_data.foods %}
             <h5 class="text-muted text-center">
-              {{ food.food_name|title }} ({{ food.serving_qty }} {{
-              food.serving_unit }})
+              {{ food.food_name|title }} ({{ food.serving_qty }} {{ food.serving_unit }})
             </h5>
             <table
               class="table table-sm table-bordered mb-3"

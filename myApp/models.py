@@ -19,6 +19,10 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(Ingredient, related_name='recipes', through='RecipeIngredient')
     nutrition_data = models.JSONField(null=True, blank=True)
     nutrition_hash = models.CharField(max_length=64, blank=True, null=True)
+    calories = models.FloatField(null=True, blank=True)
+    protein = models.FloatField(null=True, blank=True)
+    fat = models.FloatField(null=True, blank=True)
+    carbs = models.FloatField(null=True, blank=True)
 
     def get_average_rating(self):
         ratings = self.ratings.all()
