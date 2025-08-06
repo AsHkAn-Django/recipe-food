@@ -11,6 +11,7 @@ urlpatterns = [
     path('filter_list/', views.FilterListView.as_view(), name='filter_list'),
     path('add_recipe/', views.add_recipe, name='add_recipe'),
     path('ajax/create-ingredient/', views.add_recipe, name='ajax_create_ingredient'),
+    path('increment-share/', views.increment_share, name='increment_share'),
     path('', views.IndexView.as_view(), name='home'),
 ]
 

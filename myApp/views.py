@@ -6,6 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http import JsonResponse
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import Recipe, Rating, RecipeIngredient
 from .forms import IngredientForm, RecipeForm, RatingForm, RecipeIngredientFormSet, FilterRecipeForm
@@ -197,3 +198,14 @@ class RatingFormView(LoginRequiredMixin, generic.FormView):
         recipe_id = self.kwargs.get('pk')
         context['recipe'] = get_object_or_404(Recipe, id=recipe_id)
         return context
+
+
+@csrf_exempt
+def increment_share(request):
+    if request.method == 'POST':
+        recipe_pk = request.POST.get('recipe_pk')
+        recipe = get_object_or_404(Recipe, pk=recipe_pk)
+        recipe.share_count += 1
+        recipe.save()
+        return JsonResponse({'status': 'success', 'share_count': recipe.share_count})
+    return JsonResponse({'status': 'error'}, status=400)

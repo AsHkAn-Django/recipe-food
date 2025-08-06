@@ -2,7 +2,7 @@
 <div class="container my-5">
   <div class="row justify-content-center">
     <div class="col-md-8">
-        <h2 class="display-4 text-primary text-center">{{ recipe.title }}</h2>
+      <h2 class="display-4 text-primary text-center">{{ recipe.title }}</h2>
       <div class="row mb-5">
         <div class="col-md-6 d-flex flex-column align-items-center">
           <img
@@ -16,6 +16,42 @@
               max-width: 350px;
             "
           />
+          <p class="mt-2 mb-0">This Recipe Has been shared {{recipe.share_count}} times.</p>
+          <!-- Facebook -->
+          <a
+            href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
+            target="_blank"
+            onclick="incrementShare({{recipe.pk}})"
+          >
+            Facebook
+          </a>
+
+          <!-- Twitter (X) -->
+          <a
+            href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ post.title }}"
+            target="_blank"
+            onclick="incrementShare({{recipe.pk}})"
+          >
+            Twitter
+          </a>
+
+          <!-- WhatsApp -->
+          <a
+            href="https://wa.me/?text={{ request.build_absolute_uri }}"
+            target="_blank"
+            onclick="incrementShare({{recipe.pk}})"
+          >
+            WhatsApp
+          </a>
+
+          <!-- LinkedIn -->
+          <a
+            href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}"
+            target="_blank"
+            onclick="incrementShare({{recipe.pk}})"
+          >
+            LinkedIn
+          </a>
         </div>
         <div class="col-md-6 d-flex flex-column justify-content-start">
           {% if recipe.nutrition_data.foods %}
@@ -26,7 +62,8 @@
             <h4 class="text-success mb-3 text-center">Nutrition Info</h4>
             {% for food in recipe.nutrition_data.foods %}
             <h5 class="text-muted text-center">
-              {{ food.food_name|title }} ({{ food.serving_qty }} {{ food.serving_unit }})
+              {{ food.food_name|title }} ({{ food.serving_qty }}
+              {{ food.serving_unit }})
             </h5>
             <table
               class="table table-sm table-bordered mb-3"
@@ -123,4 +160,21 @@
     </div>
   </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  function incrementShare(recipe_pk){
+    $.ajax({
+      url: '/increment-share/',
+      type: 'POST',
+      data: {
+        'recipe_pk': recipe_pk,
+        'csrfmiddlewaretoken': '{{csrf_token}}'
+      },
+      success: function(response){
+        console.log('Share count updated')
+      }
+    });
+  }
+</script>
 {% endblock content %}

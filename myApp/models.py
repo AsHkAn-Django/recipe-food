@@ -17,6 +17,7 @@ class Recipe(models.Model):
     instruction = models.CharField(max_length=264)
     picture = models.ImageField(upload_to='images/', blank=True, null=True)
     ingredients = models.ManyToManyField(Ingredient, related_name='recipes', through='RecipeIngredient')
+    share_count = models.PositiveIntegerField(default=0)
     nutrition_data = models.JSONField(null=True, blank=True)
     nutrition_hash = models.CharField(max_length=64, blank=True, null=True)
     calories = models.FloatField(null=True, blank=True)
